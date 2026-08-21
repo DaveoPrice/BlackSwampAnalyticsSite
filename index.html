@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Black Swamp Analytics LLC — GIS &amp; Geospatial Analysis, Bowling Green, Ohio</title>
+<meta name="description" content="Geospatial analysis and GIS services in Bowling Green, Ohio. Land use analysis, 911 and EMA coordination mapping, and watershed mapping for northwest Ohio counties, townships, and agencies.">
+
+<!-- ==========================================================
+     STILL TO FILL IN — search the file for the word FIXME
+     1. Your email address (appears 3 times)
+     2. hero.jpg and about.jpg — upload alongside this file
+     3. Check the hours line at the bottom is right
+     ========================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400;9..144,600;9..144,700&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#E9E0C8;
+  --paper-2:#DED2B4;
+  --ink:#1A2016;
+  --ink-soft:#4B5442;
+  --contour:#A0611B;
+  --veg:#3B5130;
+  --veg-deep:#26331F;
+  --water:#2C5A62;
+  --tannin:#6E4A1E;
+  --line:rgba(26,32,22,.18);
+
+  --display:"Fraunces",Georgia,serif;
+  --body:"Karla",system-ui,-apple-system,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;color:var(--ink);
+  font-family:var(--body);font-size:17px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(58vw 42vw at 12% 4%, rgba(110,74,30,.11), transparent 62%),
+    radial-gradient(46vw 38vw at 92% 22%, rgba(44,90,98,.10), transparent 64%),
+    radial-gradient(64vw 46vw at 30% 58%, rgba(59,81,48,.11), transparent 66%),
+    radial-gradient(50vw 40vw at 84% 86%, rgba(110,74,30,.10), transparent 62%);
+  background-attachment:fixed;
+}
+/* fine silt grain over everything */
+body::before{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  opacity:.09;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body>*{position:relative;z-index:2}
+img{max-width:100%;display:block}
+h1,h2,h3{
+  font-family:var(--display);font-variation-settings:"SOFT" 40,"WONK" 1;
+  line-height:1.08;margin:0;font-weight:600;
+}
+a{color:inherit}
+.wrap{width:min(1080px,90vw);margin-inline:auto}
+
+:focus-visible{outline:3px solid var(--contour);outline-offset:3px;border-radius:2px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--veg-deep);color:var(--paper);padding:.7rem 1.1rem;z-index:100}
+.skip:focus{left:.5rem;top:.5rem}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:60;background:rgba(233,224,200,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;gap:1.5rem;padding:.8rem 0}
+.brand{text-decoration:none;margin-right:auto;line-height:1.15}
+.brand b{font-family:var(--display);font-weight:700;font-size:1.1rem;letter-spacing:-.01em;display:block}
+.brand span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.nav-links{display:flex;gap:1.5rem;list-style:none;margin:0;padding:0}
+.nav-links a{text-decoration:none;font-size:.93rem;font-weight:500;color:var(--ink-soft);padding-bottom:2px;border-bottom:1.5px solid transparent}
+.nav-links a:hover{color:var(--ink);border-bottom-color:var(--contour)}
+@media (max-width:820px){.nav-links{display:none}}
+
+.btn{display:inline-block;text-decoration:none;font-family:var(--body);font-weight:700;font-size:.95rem;padding:.72rem 1.4rem;border-radius:2px;border:1.5px solid var(--ink);transition:transform .15s ease,box-shadow .15s ease}
+.btn-solid{background:var(--ink);color:var(--paper);box-shadow:3px 3px 0 var(--contour)}
+.btn-solid:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--contour)}
+.btn-ghost{background:transparent;color:var(--ink)}
+.btn-ghost:hover{background:var(--paper-2)}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn-solid:hover{transform:none}}
+
+/* ---------- contour divider (the signature) ---------- */
+.contour{display:block;width:100%;height:34px;overflow:visible;color:var(--water);opacity:.5}
+.contour path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round}
+.contour.tannin{color:var(--tannin);opacity:.45}
+
+/* ---------- marsh band ---------- */
+.marsh{display:block;width:100%;height:clamp(72px,9vw,120px)}
+.marsh path{fill:none;stroke:currentColor;stroke-linecap:round}
+.marsh-back{color:var(--veg);opacity:.3}
+.marsh-front{color:var(--veg-deep);opacity:.52}
+.marsh-cat{color:var(--veg-deep);opacity:.75}
+.marsh-cat .head{fill:var(--tannin)}
+.marsh-band{overflow:hidden;line-height:0}
+.marsh-edge{margin-bottom:-2px}
+@media (max-width:600px){.marsh{height:62px}}
+
+/* ---------- sections ---------- */
+.sec{padding:5.5rem 0}
+@media (max-width:700px){.sec{padding:3.75rem 0}}
+.eyebrow{font-family:var(--body);font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--veg);margin:0 0 .9rem}
+.sec h2{font-size:clamp(1.9rem,4.2vw,2.85rem);max-width:19ch;margin-bottom:1.1rem}
+.lede{font-size:1.06rem;color:var(--ink-soft);max-width:60ch;margin:0}
+
+/* ---------- hero ---------- */
+.hero{padding:4.5rem 0 4rem}
+.hero-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:3.5rem;align-items:center}
+@media (max-width:880px){.hero-grid{grid-template-columns:1fr;gap:2.5rem}}
+.hero h1{font-size:clamp(2.3rem,5.6vw,3.9rem);letter-spacing:-.02em;margin-bottom:1.4rem;max-width:17ch}
+.hero h1 em{font-style:normal;position:relative;white-space:nowrap}
+.underline{position:absolute;left:0;right:0;bottom:-.2em;width:100%;height:.3em;color:var(--contour);overflow:visible}
+.underline path{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round}
+.hero .lede{font-size:1.15rem;margin-bottom:2rem}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.85rem;margin-bottom:1.7rem}
+.trust{font-size:.9rem;color:var(--ink-soft);margin:0}
+.trust strong{color:var(--ink)}
+
+/* map-plate figure */
+.plate{position:relative;margin:0;padding:.7rem;background:var(--paper-2);border:1.5px solid var(--line);box-shadow:0 14px 34px -22px rgba(26,32,22,.55)}
+.plate::before,.plate::after{content:"";position:absolute;width:13px;height:13px;border:1.5px solid var(--contour)}
+.plate::before{top:-1.5px;left:-1.5px;border-right:0;border-bottom:0}
+.plate::after{bottom:-1.5px;right:-1.5px;border-left:0;border-top:0}
+.plate img{aspect-ratio:4/5;object-fit:cover;width:100%;background:#cdbf9e}
+.plate figcaption{display:flex;justify-content:space-between;gap:1rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:.7rem}
+
+/* ---------- services ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+@media (max-width:880px){.cards{grid-template-columns:1fr}}
+.card{background:linear-gradient(160deg,rgba(222,210,180,.95),rgba(222,210,180,.72));border:1.5px solid var(--line);border-top:2.5px solid var(--veg);padding:1.9rem 1.6rem;display:flex;flex-direction:column;box-shadow:0 1px 0 rgba(255,255,255,.35) inset}
+.card h3{font-size:1.3rem;margin-bottom:.7rem}
+.card p{margin:0 0 1.1rem;color:var(--ink-soft);font-size:.97rem}
+.card ul{margin:auto 0 0;padding:0;list-style:none;font-size:.9rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:1rem}
+.card li{padding-left:1.1rem;position:relative;margin-bottom:.3rem}
+.card li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;background:var(--contour)}
+.card-mark{margin-bottom:1.1rem}
+.m-veg{color:var(--veg)} .m-ink{color:var(--ink)} .m-water{color:var(--water)}
+
+.aside-note{margin-top:2.5rem;padding:1.5rem 1.7rem;border-left:2.5px solid var(--water);background:rgba(44,90,98,.08)}
+.aside-note h3{font-size:1.15rem;margin-bottom:.5rem}
+.aside-note p{margin:0;color:var(--ink-soft);font-size:.98rem;max-width:62ch}
+
+/* ---------- selected work ---------- */
+.projects{margin-top:3rem;border-top:1.5px solid var(--line)}
+.proj{display:grid;grid-template-columns:.34fr .66fr;gap:2.8rem;padding:2.6rem 0;border-bottom:1px solid var(--line);align-items:start}
+@media (max-width:820px){.proj{grid-template-columns:1fr;gap:1.1rem;padding:2rem 0}}
+.proj-n{font-family:var(--display);font-size:.82rem;font-weight:700;letter-spacing:.18em;color:var(--contour);display:block;margin-bottom:.7rem}
+.proj-meta dt{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-top:.9rem}
+.proj-meta dt:first-of-type{margin-top:0}
+.proj-meta dd{margin:.15rem 0 0;font-size:.94rem}
+.proj h3{font-size:1.42rem;margin-bottom:.8rem;max-width:24ch}
+.proj p{margin:0 0 .9rem;color:var(--ink-soft);font-size:.99rem;max-width:64ch}
+.proj p:last-of-type{margin-bottom:0}
+.figs{display:flex;flex-wrap:wrap;gap:1.1rem 2.2rem;margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+.fig b{display:block;font-family:var(--display);font-weight:700;font-size:1.55rem;color:var(--contour);line-height:1;margin-bottom:.25rem}
+.fig span{font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}
+.proj-also{margin-top:2.2rem;font-size:.97rem;color:var(--ink-soft);max-width:66ch}
+.proj-note{margin-top:2.6rem;padding:1.4rem 1.6rem;background:rgba(59,81,48,.09);border:1.5px solid var(--line);border-left:2.5px solid var(--veg);font-size:.92rem;color:var(--ink-soft)}
+.proj-note p{margin:0;max-width:70ch}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:.75fr 1.25fr;gap:3.5rem;align-items:start}
+@media (max-width:880px){.about-grid{grid-template-columns:1fr;gap:2rem}}
+.about-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border:1.5px solid var(--line);background:#cdbf9e;box-shadow:0 12px 30px -20px rgba(26,32,22,.55)}
+.about-body p{color:var(--ink-soft)}
+.about-body p.big{font-family:var(--display);font-size:1.28rem;color:var(--ink);line-height:1.45}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem}
+@media (max-width:880px){.steps{grid-template-columns:1fr;gap:1.5rem}}
+.step-n{font-family:var(--display);font-size:2.5rem;font-weight:700;color:var(--contour);line-height:1;display:block;margin-bottom:.5rem}
+.step h3{font-size:1.18rem;margin-bottom:.45rem}
+.step p{margin:0;color:var(--ink-soft);font-size:.97rem}
+
+/* ---------- who it's for ---------- */
+.who{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem 2.5rem;margin-top:2.5rem;padding:0;list-style:none}
+@media (max-width:700px){.who{grid-template-columns:1fr}}
+.who li{display:flex;gap:.85rem;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:.9rem}
+.who b{font-weight:700;font-size:1rem;flex:0 0 auto}
+.who span{color:var(--ink-soft);font-size:.94rem}
+
+/* ---------- contact ---------- */
+.contact{position:relative;color:var(--paper);
+  background-color:var(--veg-deep);
+  background-image:
+    radial-gradient(60vw 40vw at 15% 0%, rgba(44,90,98,.42), transparent 60%),
+    radial-gradient(50vw 42vw at 88% 100%, rgba(110,74,30,.34), transparent 62%);}
+.contact .eyebrow{color:var(--contour)}
+.contact .lede{color:rgba(233,224,200,.78)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start}
+@media (max-width:880px){.contact-grid{grid-template-columns:1fr;gap:2.5rem}}
+.contact .btn-solid{background:var(--contour);color:#fff;border-color:var(--contour);box-shadow:3px 3px 0 rgba(233,224,200,.35)}
+.contact .btn-ghost{color:var(--paper);border-color:rgba(233,224,200,.5)}
+.contact .btn-ghost:hover{background:rgba(233,224,200,.12)}
+.contact-cta{display:flex;flex-wrap:wrap;gap:.85rem;margin-top:2rem}
+.details{margin:0;font-size:1rem}
+.details dt{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--contour);margin-top:1.5rem}
+.details dt:first-child{margin-top:0}
+.details dd{margin:.3rem 0 0;color:rgba(233,224,200,.9)}
+.details a{text-decoration:none;border-bottom:1px solid rgba(181,112,28,.7)}
+.details a:hover{border-bottom-color:var(--contour)}
+
+/* ---------- footer ---------- */
+.foot{padding:2.2rem 0;font-size:.87rem;color:var(--ink-soft)}
+.foot-in{display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--ink)}
+.coords{letter-spacing:.08em}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><b>Black Swamp Analytics</b><span>Bowling Green, Ohio</span></a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#projects">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">How it works</a></li>
+      <li><a href="#who">Who it's for</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a class="btn btn-solid" href="#contact">Get in touch</a>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<header class="hero wrap" id="top">
+  <div class="hero-grid">
+    <div>
+      <h1>Geospatial analysis for <em>northwest Ohio<svg class="underline" viewBox="0 0 300 10" preserveAspectRatio="none" aria-hidden="true"><path d="M4 6C54 2 108 8 152 4s94 3 144 0"/></svg></em>.</h1>
+      <p class="lede">Black Swamp Analytics is a one-person GIS consultancy in Bowling Green. I build land use analyses, emergency response maps, and watershed models for the counties, townships, and agencies that have to act on them — and you get the underlying data, not just a picture of it.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="tel:+14197793101">Call (419) 779-3101</a>
+        <a class="btn btn-ghost" href="#projects">See recent work</a>
+      </div>
+      <p class="trust"><strong>Nearly ten years in geospatial work</strong>, including graduate study · Based in Bowling Green, Ohio<br>Recent work in <strong>Defiance, Paulding, Williams, Wood, Sandusky, Miami</strong> and <strong>Richland</strong> counties</p>
+    </div>
+
+    <figure class="plate">
+      <!-- FIXME: upload a photo named hero.jpg — a map you've produced, or you at work -->
+      <img src="hero.jpg" alt="A land use map of a northwest Ohio township produced by Black Swamp Analytics">
+      <figcaption><span>Fig. 1</span><span>Wood County, OH</span></figcaption>
+    </figure>
+  </div>
+</header>
+
+<svg class="contour wrap" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 6c130 7 210-6 340-2s200 9 330 4 180-7 330-3"/>
+  <path d="M0 15c140 6 220-5 350-1s190 8 320 3 190-6 330-2"/>
+  <path d="M0 24c150 5 200-4 340 0s210 7 330 2 170-5 330-1"/>
+</svg>
+
+<!-- ================= SERVICES ================= -->
+<section class="sec wrap reveal" id="services">
+  <p class="eyebrow">Services</p>
+  <h2>Three kinds of work, all of it local</h2>
+  <p class="lede">The Great Black Swamp was drained by hand and by tile over the better part of a century. Almost every land use and drainage question in this region still traces back to that. Knowing the ground matters as much as knowing the software.</p>
+
+  <div class="cards">
+    <article class="card">
+      <svg class="card-mark m-veg" width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h26v22H4z"/><path d="M4 15h26M15 6v22"/></svg>
+      <h3>Land use analysis</h3>
+      <p>Parcel and zoning work for planning commissions, township trustees, and county planners — including change over time, farmland conversion, and suitability for a proposed use.</p>
+      <ul>
+        <li>Parcel &amp; zoning inventories</li>
+        <li>Land cover change detection</li>
+        <li>Development suitability</li>
+        <li>Comprehensive plan mapping</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <svg class="card-mark m-ink" width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M17 4v26M4 17h26"/><circle cx="17" cy="17" r="7"/></svg>
+      <h3>911 &amp; EMA coordination mapping</h3>
+      <p>Response-side geospatial work for county EMA offices and 911 districts. The kind of data that has to be right the first time it's queried, at three in the morning.</p>
+      <ul>
+        <li>Address point verification</li>
+        <li>Road centerline maintenance</li>
+        <li>Hazard &amp; evacuation mapping</li>
+        <li>Response coverage analysis</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <svg class="card-mark m-water" width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 11c6-4 12 4 18 0s6-2 8-3"/><path d="M4 19c6-4 12 4 18 0s6-2 8-3"/><path d="M4 27c6-4 12 4 18 0s6-2 8-3"/></svg>
+      <h3>Watershed mapping</h3>
+      <p>Delineation and drainage analysis for soil and water conservation districts, county engineers, and watershed groups working a region defined by how its water leaves.</p>
+      <ul>
+        <li>Watershed &amp; subbasin delineation</li>
+        <li>Flow accumulation modeling</li>
+        <li>Ditch &amp; tile network mapping</li>
+        <li>Runoff &amp; nutrient context</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="aside-note">
+    <h3>Not everything needs a map</h3>
+    <p>Plenty of the work is ordinary data analytics: cleaning up a spreadsheet that four people have edited, building a report that runs itself every month, or getting numbers into the shape a grant application demands. If your problem is data-shaped rather than map-shaped, it's still worth a call.</p>
+  </div>
+</section>
+
+<svg class="contour wrap tannin" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 24c150-7 220 5 350 1s200-8 330-3 180 6 320 2"/>
+  <path d="M0 15c140-6 230 4 340 0s210-7 330-2 190 5 330 1"/>
+  <path d="M0 6c160-5 210 4 340 0s200-6 330-1 170 4 330 0"/>
+</svg>
+
+<!-- ================= SELECTED WORK ================= -->
+<section class="sec wrap reveal" id="projects">
+  <p class="eyebrow">Selected work</p>
+  <h2>Projects, and the numbers that came out of them</h2>
+  <p class="lede">A sample of recent land use and zoning analysis across northwest and west-central Ohio, performed under contract to Reveille Planning Ltd. Client data stays with the client — what's described here is method and result.</p>
+
+  <div class="projects">
+
+    <article class="proj">
+      <div class="proj-meta">
+        <span class="proj-n">01</span>
+        <dl>
+          <dt>Where</dt><dd>Defiance, Paulding &amp; Williams Counties</dd>
+          <dt>What</dt><dd>Regional land use plan</dd>
+          <dt>Role</dt><dd>GIS lead, in partnership with the Maumee Valley Planning Organization</dd>
+          <dt>Year</dt><dd>2026</dd>
+        </dl>
+      </div>
+      <div>
+        <h3>A three-county land use plan built from scratch</h3>
+        <p>There was no regional dataset to inherit. The base had to be assembled county by county — parcels and zoning from three separate county portals, road inventory from ODOT TIMS, demographics from Census TIGER/Line — and reconciled into layers that behaved consistently across county lines.</p>
+        <p>The cartography got the same treatment. Rather than three unrelated map series, I built one layout template that reskins per county: same grid, same typography, same legend and credit block, with only the header lockup, accent color, and county seal changing. The plan reads as a single document, and each board still sees a map that looks like theirs.</p>
+        <div class="figs">
+          <div class="fig"><b>3</b><span>Counties, one plan</span></div>
+          <div class="fig"><b>1</b><span>Shared map template</span></div>
+          <div class="fig"><b>0</b><span>Regional datasets that existed first</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-meta">
+        <span class="proj-n">02</span>
+        <dl>
+          <dt>Where</dt><dd>Perrysburg Township, Wood County</dd>
+          <dt>What</dt><dd>Land use inventory &amp; CAUV enrollment</dd>
+          <dt>Role</dt><dd>Analysis and deliverables</dd>
+          <dt>Year</dt><dd>2026</dd>
+        </dl>
+      </div>
+      <div>
+        <h3>Finding the farmland when the county doesn't flag it</h3>
+        <p>Wood County doesn't follow the standard Ohio DTE land use scheme — the 300-series is industrial rather than residential, and the 500-series functions as a tax exemption overlay rather than an institutional use. Every code had to be crosswalked to planning categories that a commission could actually read, with the ambiguous ones flagged rather than quietly assigned.</p>
+        <p>The CAUV question was harder. The parcel export carries no enrollment field, which the Auditor's office confirmed by phone; the only authoritative check is parcel-by-parcel on Beacon. So enrollment was derived from the reduced valuation, spot-checked against Beacon property reports, and the whole chain was written up on its own worksheet — because a number like 58.83% only survives a public meeting if you can show where it came from.</p>
+        <div class="figs">
+          <div class="fig"><b>5,655</b><span>Parcels classified</span></div>
+          <div class="fig"><b>12,699</b><span>Acres in CAUV</span></div>
+          <div class="fig"><b>58.8%</b><span>Of the township</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-meta">
+        <span class="proj-n">03</span>
+        <dl>
+          <dt>Where</dt><dd>Tipp City, Miami County</dd>
+          <dt>What</dt><dd>Existing land use &amp; zoning analysis</dd>
+          <dt>Role</dt><dd>Analysis and deliverables</dd>
+          <dt>Year</dt><dd>2026</dd>
+        </dl>
+      </div>
+      <div>
+        <h3>Reconciling 167 acres that didn't want to be reconciled</h3>
+        <p>Existing land use and zoning, summarized citywide and broken out across seven planning areas and eighteen zoning districts — including the unincorporated township land inside the planning boundary but outside city jurisdiction, which is exactly the row that gets argued about.</p>
+        <p>The planning area polygons totaled about 167 acres more than the classified land use table. That gap is roads, water, and geometry slivers carrying no land use assignment. I tracked it down, established the correct denominator, and put a methodology note on the face of the spreadsheet explaining why the totals don't tie and why that's right rather than wrong.</p>
+        <div class="figs">
+          <div class="fig"><b>7</b><span>Planning areas</span></div>
+          <div class="fig"><b>18</b><span>Zoning districts</span></div>
+          <div class="fig"><b>10,251</b><span>Acres classified</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-meta">
+        <span class="proj-n">04</span>
+        <dl>
+          <dt>Where</dt><dd>City of Ontario, Richland County</dd>
+          <dt>What</dt><dd>Zoning conformity review</dd>
+          <dt>Role</dt><dd>Parcel analysis</dd>
+          <dt>Year</dt><dd>2026</dd>
+        </dl>
+      </div>
+      <div>
+        <h3>Which parcels no longer fit the district they're in</h3>
+        <p>Parcel-level work to identify non-conforming residential lots by zoning district, and to flag residentially-used parcels sitting inside non-residential districts — concentrated in the Park East and Old Ontario areas, where the zoning map and the built reality drifted apart decades ago.</p>
+        <p>One honest limitation was worth naming up front: CAMA data gives acreage but not lot dimensions or frontage, so conformity tests that depend on lot width can't be answered from the parcel table alone. Better to scope that at the start than to deliver a number nobody can stand behind.</p>
+      </div>
+    </article>
+
+  </div>
+
+  <p class="proj-also">Also: countywide land use classification for Sandusky County across 33,353 parcels, and CAUV enrollment analysis for Waterville Township — 175 parcels, roughly 5,907 acres.</p>
+
+  <div class="proj-note">
+    <p>Most of this work arrives as a formatted Excel workbook with a summary tab, a breakdown by planning area or district, and a methodology note written in plain English — plus the geodatabase or shapefile behind it. The point is that six months from now, somebody else can pick it up and see how the number was made.</p>
+  </div>
+</section>
+
+<svg class="contour wrap" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 9c150 6 210-5 340-1s200 8 330 3 180-6 330-2"/>
+  <path d="M0 18c140 5 230-4 350 0s190 7 320 2 190-5 330-1"/>
+  <path d="M0 27c160 4 200-3 340 1s210 6 330 1 170-4 330 0"/>
+</svg>
+
+<!-- ================= ABOUT ================= -->
+<section class="sec wrap reveal" id="about">
+  <div class="about-grid">
+    <div>
+      <!-- FIXME: upload a photo named about.jpg — just you. People hire people. -->
+      <img class="about-photo" src="about.jpg" alt="Portrait of the owner of Black Swamp Analytics">
+    </div>
+    <div class="about-body">
+      <p class="eyebrow">About</p>
+      <p class="big">Every map is an argument. I'd rather hand you one you can defend in a public meeting.</p>
+      <p>I've been doing geospatial work for close to ten years, counting the years I spent studying it. Black Swamp Analytics is the name I registered for it in August 2026 — the company is new, the work behind it isn't.</p>
+      <p>It's a one-person firm on purpose. The person who scopes your project is the person who writes the queries and the person who answers the phone when a commissioner has a question about slide fourteen. Nothing gets handed to a junior analyst you've never met, and nothing gets lost between them and me.</p>
+      <p>I named it after the Great Black Swamp because that's the ground I work on. Northwest Ohio's drainage history explains an enormous amount about why parcels sit where they do, why certain roads flood, and where a watershed boundary is going to surprise you. That context doesn't come out of a national dataset.</p>
+    </div>
+  </div>
+</section>
+
+<svg class="contour wrap tannin" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 8c140 6 230-5 340-1s200 8 330 3 180-6 330-2"/>
+  <path d="M0 17c150 5 210-4 350 0s190 7 320 2 190-5 330-1"/>
+  <path d="M0 26c130 4 220-3 340 1s210 6 330 1 170-4 330 0"/>
+</svg>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="sec wrap reveal" id="work">
+  <p class="eyebrow">How it works</p>
+  <h2>What to expect</h2>
+
+  <div class="steps">
+    <div class="step">
+      <span class="step-n">1</span>
+      <h3>A call, first</h3>
+      <p>Tell me what decision the map has to support and who's going to be looking at it. Fifteen minutes on the phone usually settles whether I'm the right fit. If I'm not, I'll say so.</p>
+    </div>
+    <div class="step">
+      <span class="step-n">2</span>
+      <h3>Scope and data, in writing</h3>
+      <p>You get the deliverables, the timeline, the price, and a plain list of what data I need from you and what I'll source myself. No work starts until that's agreed.</p>
+    </div>
+    <div class="step">
+      <span class="step-n">3</span>
+      <h3>Deliverables you own</h3>
+      <p>Finished maps, plus the geodatabases, shapefiles, and documentation behind them. If you bring on someone else later, or take it in-house, everything is yours and it's readable.</p>
+    </div>
+  </div>
+</section>
+
+<svg class="contour wrap" viewBox="0 0 1000 34" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 26c160-6 200 5 340 1s220-7 330-2 170 5 330 1"/>
+  <path d="M0 17c140-5 230 3 340-1s200 6 330 1 180-5 330-1"/>
+  <path d="M0 8c150-4 210 4 350 0s190-5 320 0 190 4 330 0"/>
+</svg>
+
+<!-- ================= WHO IT'S FOR ================= -->
+<section class="sec wrap reveal" id="who">
+  <p class="eyebrow">Who it's for</p>
+  <h2>The people who usually need this</h2>
+  <p class="lede">If you're one of these and you're currently doing it in a spreadsheet, or paying a firm three hours away to do it, there's probably a conversation worth having.</p>
+
+  <ul class="who">
+    <li><b>County EMA offices</b><span>Hazard mapping, response coverage, address data that has to be current</span></li>
+    <li><b>911 districts</b><span>Centerline and address point maintenance</span></li>
+    <li><b>Township trustees</b><span>Zoning and land use questions without a full-time GIS staffer</span></li>
+    <li><b>Planning commissions</b><span>Comprehensive plan mapping and development review</span></li>
+    <li><b>Soil &amp; water conservation districts</b><span>Watershed delineation and drainage analysis</span></li>
+    <li><b>County engineers</b><span>Ditch networks, drainage, infrastructure context</span></li>
+    <li><b>Watershed &amp; conservation groups</b><span>Mapping for grant applications and public meetings</span></li>
+    <li><b>Engineering &amp; planning firms</b><span>Overflow GIS work on a project basis</span></li>
+  </ul>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<div class="marsh-band marsh-edge">
+<svg class="marsh" viewBox="0 0 1200 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <g class="marsh-back"><path d="M-10 120 C-11 99 -16 81 -19 74" stroke-width="1.3"/><path d="M6 120 C7 96 10 75 12 68" stroke-width="1.6"/><path d="M18 120 C19 94 20 71 21 63" stroke-width="1.7"/><path d="M33 120 C32 93 31 68 31 59" stroke-width="1.3"/><path d="M43 120 C41 94 36 71 32 63" stroke-width="1.7"/><path d="M57 120 C58 104 63 89 66 84" stroke-width="1.2"/><path d="M73 120 C71 93 67 68 64 59" stroke-width="1.7"/><path d="M88 120 C88 103 91 88 93 82" stroke-width="1.3"/><path d="M104 120 C106 95 114 72 119 64" stroke-width="1.2"/><path d="M115 120 C116 96 118 74 119 66" stroke-width="1.3"/><path d="M132 120 C131 93 127 68 125 59" stroke-width="1.3"/><path d="M146 120 C147 99 149 80 151 73" stroke-width="1.5"/><path d="M158 120 C156 104 150 91 146 85" stroke-width="1.5"/><path d="M173 120 C174 99 178 80 181 72" stroke-width="1.6"/><path d="M189 120 C188 95 185 73 183 65" stroke-width="1.3"/><path d="M198 120 C200 104 206 90 210 85" stroke-width="1.8"/><path d="M213 120 C214 103 217 88 219 83" stroke-width="1.3"/><path d="M230 120 C231 95 235 73 238 65" stroke-width="1.6"/><path d="M242 120 C244 92 252 68 257 59" stroke-width="1.4"/><path d="M254 120 C255 94 258 71 260 63" stroke-width="1.5"/><path d="M267 120 C266 91 262 65 260 55" stroke-width="1.3"/><path d="M282 120 C283 101 290 84 294 77" stroke-width="1.4"/><path d="M298 120 C300 99 306 81 310 74" stroke-width="1.7"/><path d="M313 120 C311 102 306 85 302 79" stroke-width="1.2"/><path d="M323 120 C321 95 314 73 309 65" stroke-width="1.4"/><path d="M337 120 C336 102 333 87 331 81" stroke-width="1.4"/><path d="M351 120 C354 103 362 88 367 82" stroke-width="1.6"/><path d="M366 120 C366 97 366 76 366 68" stroke-width="1.9"/><path d="M382 120 C380 93 372 69 367 60" stroke-width="1.6"/><path d="M399 120 C399 96 399 74 399 66" stroke-width="1.7"/><path d="M409 120 C410 94 415 71 418 63" stroke-width="1.3"/><path d="M422 120 C421 96 419 75 417 67" stroke-width="1.7"/><path d="M438 120 C438 92 434 66 432 57" stroke-width="1.3"/><path d="M454 120 C456 96 461 74 465 66" stroke-width="1.8"/><path d="M466 120 C465 96 461 75 459 67" stroke-width="1.8"/><path d="M480 120 C480 101 480 85 480 78" stroke-width="1.6"/><path d="M491 120 C491 102 490 86 490 80" stroke-width="1.3"/><path d="M504 120 C505 91 511 66 514 56" stroke-width="1.2"/><path d="M519 120 C520 94 524 72 526 63" stroke-width="1.2"/><path d="M535 120 C536 102 541 86 544 80" stroke-width="1.4"/><path d="M546 120 C548 102 554 86 558 80" stroke-width="1.4"/><path d="M562 120 C561 97 555 77 551 70" stroke-width="1.7"/><path d="M576 120 C577 104 582 90 586 85" stroke-width="1.4"/><path d="M585 120 C586 94 590 70 592 61" stroke-width="1.5"/><path d="M595 120 C596 97 597 77 598 69" stroke-width="1.7"/><path d="M608 120 C609 97 613 76 615 68" stroke-width="1.3"/><path d="M619 120 C620 98 624 78 627 70" stroke-width="1.8"/><path d="M635 120 C636 98 639 79 641 72" stroke-width="1.3"/><path d="M647 120 C648 104 654 89 657 84" stroke-width="1.9"/><path d="M661 120 C660 94 658 71 657 62" stroke-width="1.8"/><path d="M671 120 C670 99 668 81 666 74" stroke-width="1.8"/><path d="M681 120 C679 102 673 87 668 81" stroke-width="1.8"/><path d="M693 120 C692 92 689 67 687 57" stroke-width="1.8"/><path d="M703 120 C705 92 713 67 718 57" stroke-width="1.8"/><path d="M718 120 C720 92 726 67 731 57" stroke-width="1.9"/><path d="M729 120 C730 92 735 68 738 59" stroke-width="1.4"/><path d="M739 120 C739 92 739 67 738 57" stroke-width="1.6"/><path d="M755 120 C754 98 750 78 747 71" stroke-width="1.7"/><path d="M769 120 C770 101 773 84 775 77" stroke-width="1.8"/><path d="M780 120 C781 93 785 69 788 60" stroke-width="1.6"/><path d="M790 120 C789 95 786 73 783 65" stroke-width="1.4"/><path d="M806 120 C804 101 797 84 793 77" stroke-width="1.8"/><path d="M823 120 C822 100 821 83 820 76" stroke-width="1.6"/><path d="M838 120 C839 105 841 91 843 86" stroke-width="1.4"/><path d="M854 120 C857 99 864 80 869 73" stroke-width="1.5"/><path d="M869 120 C867 104 862 90 859 85" stroke-width="1.4"/><path d="M881 120 C880 102 879 86 878 80" stroke-width="1.3"/><path d="M894 120 C896 91 902 65 906 55" stroke-width="1.6"/><path d="M911 120 C912 94 914 71 915 63" stroke-width="1.5"/><path d="M921 120 C923 92 929 67 933 57" stroke-width="1.8"/><path d="M935 120 C937 93 945 69 950 60" stroke-width="1.9"/><path d="M950 120 C952 104 960 91 965 85" stroke-width="1.6"/><path d="M963 120 C962 98 958 79 956 72" stroke-width="1.2"/><path d="M977 120 C975 96 968 74 964 66" stroke-width="1.8"/><path d="M993 120 C993 92 994 68 994 58" stroke-width="1.5"/><path d="M1006 120 C1008 99 1015 81 1020 74" stroke-width="1.8"/><path d="M1022 120 C1022 97 1022 77 1022 69" stroke-width="1.7"/><path d="M1033 120 C1036 102 1043 86 1049 80" stroke-width="1.4"/><path d="M1045 120 C1043 98 1036 78 1031 70" stroke-width="1.6"/><path d="M1055 120 C1053 93 1046 69 1041 59" stroke-width="1.8"/><path d="M1066 120 C1067 93 1072 70 1076 61" stroke-width="1.9"/><path d="M1076 120 C1075 91 1069 64 1065 54" stroke-width="1.4"/><path d="M1085 120 C1083 98 1077 78 1072 70" stroke-width="1.6"/><path d="M1102 120 C1103 93 1105 70 1107 61" stroke-width="1.3"/><path d="M1119 120 C1121 99 1128 81 1133 74" stroke-width="1.3"/><path d="M1130 120 C1131 91 1135 65 1138 56" stroke-width="1.3"/><path d="M1143 120 C1142 97 1138 76 1135 69" stroke-width="1.4"/><path d="M1152 120 C1152 97 1151 77 1150 70" stroke-width="1.4"/><path d="M1165 120 C1165 100 1163 82 1162 75" stroke-width="1.7"/><path d="M1175 120 C1175 103 1174 89 1174 83" stroke-width="1.4"/><path d="M1188 120 C1190 92 1198 68 1203 58" stroke-width="1.8"/><path d="M1205 120 C1204 101 1201 85 1200 79" stroke-width="1.3"/><path d="M1216 120 C1215 101 1211 84 1208 78" stroke-width="1.4"/></g>
+  <g class="marsh-front"><path d="M-10 120 C-7 86 1 57 8 45" stroke-width="2.0"/><path d="M17 120 C18 83 20 51 22 39" stroke-width="2.3"/><path d="M43 120 C41 87 35 57 31 46" stroke-width="1.7"/><path d="M66 120 C63 89 55 61 50 50" stroke-width="2.4"/><path d="M83 120 C81 88 76 59 72 49" stroke-width="1.9"/><path d="M112 120 C111 78 109 40 107 26" stroke-width="2.2"/><path d="M141 120 C141 91 138 65 137 55" stroke-width="1.9"/><path d="M170 120 C173 91 181 64 187 55" stroke-width="1.7"/><path d="M197 120 C193 84 183 52 176 40" stroke-width="1.9"/><path d="M225 120 C222 89 213 61 206 50" stroke-width="2.0"/><path d="M250 120 C249 87 248 58 246 47" stroke-width="2.4"/><path d="M276 120 C276 88 275 59 274 48" stroke-width="2.2"/><path d="M297 120 C298 87 304 58 308 47" stroke-width="1.7"/><path d="M316 120 C317 96 320 74 323 66" stroke-width="2.2"/><path d="M342 120 C339 84 328 53 321 41" stroke-width="1.9"/><path d="M365 120 C364 90 358 63 354 53" stroke-width="1.9"/><path d="M385 120 C386 95 388 73 389 65" stroke-width="1.6"/><path d="M409 120 C411 89 417 61 422 50" stroke-width="2.2"/><path d="M432 120 C433 96 438 76 441 68" stroke-width="2.2"/><path d="M458 120 C458 77 458 39 458 24" stroke-width="1.9"/><path d="M482 120 C483 95 486 72 488 63" stroke-width="1.7"/><path d="M509 120 C510 84 514 53 517 41" stroke-width="1.7"/><path d="M536 120 C539 78 550 41 557 27" stroke-width="2.2"/><path d="M555 120 C553 81 546 47 541 34" stroke-width="2.4"/><path d="M572 120 C572 96 570 75 568 67" stroke-width="1.7"/><path d="M603 120 C601 78 596 41 592 27" stroke-width="2.3"/><path d="M625 120 C622 80 614 45 608 32" stroke-width="2.4"/><path d="M648 120 C648 92 646 67 645 58" stroke-width="1.6"/><path d="M665 120 C666 87 668 58 670 47" stroke-width="2.4"/><path d="M690 120 C688 90 683 63 679 53" stroke-width="1.6"/><path d="M720 120 C718 83 713 50 709 37" stroke-width="2.2"/><path d="M746 120 C746 84 745 52 744 40" stroke-width="2.3"/><path d="M776 120 C774 82 767 47 762 35" stroke-width="2.0"/><path d="M802 120 C802 78 802 40 802 26" stroke-width="2.0"/><path d="M820 120 C819 95 813 73 810 65" stroke-width="2.1"/><path d="M840 120 C841 82 844 48 846 35" stroke-width="1.8"/><path d="M864 120 C861 80 851 45 844 31" stroke-width="2.1"/><path d="M892 120 C891 77 887 40 885 25" stroke-width="2.1"/><path d="M920 120 C922 91 928 64 932 55" stroke-width="2.2"/><path d="M951 120 C948 88 939 60 933 50" stroke-width="2.0"/><path d="M977 120 C979 79 984 42 988 28" stroke-width="2.0"/><path d="M1006 120 C1007 80 1009 44 1011 31" stroke-width="1.8"/><path d="M1023 120 C1020 85 1009 54 1002 42" stroke-width="1.9"/><path d="M1054 120 C1055 91 1059 66 1062 57" stroke-width="2.2"/><path d="M1076 120 C1078 85 1087 53 1093 42" stroke-width="2.2"/><path d="M1097 120 C1098 77 1102 39 1105 24" stroke-width="1.8"/><path d="M1126 120 C1128 81 1136 46 1142 34" stroke-width="2.3"/><path d="M1154 120 C1155 89 1161 61 1165 51" stroke-width="2.2"/><path d="M1182 120 C1185 92 1196 68 1204 59" stroke-width="2.1"/><path d="M1212 120 C1214 86 1220 56 1224 45" stroke-width="2.1"/></g>
+  <g class="marsh-cat"><path class="stem" d="M70 120 C69 66 67 34 66 13" stroke-width="2.2"/><rect class="head" x="62.2" y="13" width="7.0" height="23" rx="3.5"/><path class="stem" d="M66 13 l-2 -12" stroke-width="1.6"/><path class="stem" d="M212 120 C213 67 213 35 213 14" stroke-width="2.2"/><rect class="head" x="209.4" y="14" width="7.0" height="21" rx="3.5"/><path class="stem" d="M213 14 l0 -12" stroke-width="1.6"/><path class="stem" d="M342 120 C341 72 336 43 333 23" stroke-width="2.2"/><rect class="head" x="329.9" y="23" width="7.0" height="20" rx="3.5"/><path class="stem" d="M333 23 l-5 -12" stroke-width="1.6"/><path class="stem" d="M476 120 C476 70 475 40 474 20" stroke-width="2.2"/><rect class="head" x="470.8" y="20" width="7.0" height="20" rx="3.5"/><path class="stem" d="M474 20 l-1 -12" stroke-width="1.6"/><path class="stem" d="M599 120 C598 69 594 38 592 17" stroke-width="2.2"/><rect class="head" x="588.0" y="17" width="7.0" height="18" rx="3.5"/><path class="stem" d="M592 17 l-5 -12" stroke-width="1.6"/><path class="stem" d="M735 120 C736 65 740 31 742 9" stroke-width="2.2"/><rect class="head" x="738.4" y="9" width="7.0" height="21" rx="3.5"/><path class="stem" d="M742 9 l4 -12" stroke-width="1.6"/><path class="stem" d="M894 120 C895 74 896 47 897 29" stroke-width="2.2"/><rect class="head" x="893.4" y="29" width="7.0" height="20" rx="3.5"/><path class="stem" d="M897 29 l2 -12" stroke-width="1.6"/><path class="stem" d="M1002 120 C1001 69 998 39 995 19" stroke-width="2.2"/><rect class="head" x="991.9" y="19" width="7.0" height="19" rx="3.5"/><path class="stem" d="M995 19 l-4 -12" stroke-width="1.6"/><path class="stem" d="M1139 120 C1140 74 1144 46 1146 28" stroke-width="2.2"/><rect class="head" x="1142.2" y="28" width="7.0" height="20" rx="3.5"/><path class="stem" d="M1146 28 l4 -12" stroke-width="1.6"/></g>
+</svg>
+</div>
+<section class="sec contact" id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <p class="eyebrow">Contact</p>
+      <h2>Tell me what you're trying to figure out</h2>
+      <p class="lede">The most useful thing you can lead with is the question you need answered and the date you need it by. Whether you already have the data is the second question, not the first — often you have more than you think.</p>
+      <div class="contact-cta">
+        <a class="btn btn-solid" href="tel:+14197793101">Call (419) 779-3101</a>
+        <!-- FIXME: your email address, here and twice below -->
+        <a class="btn btn-ghost" href="mailto:you@blackswampanalytics.com">Send an email</a>
+      </div>
+    </div>
+
+    <dl class="details">
+      <dt>Phone</dt>
+      <dd><a href="tel:+14197793101">(419) 779-3101</a></dd>
+
+      <dt>Email</dt>
+      <!-- FIXME -->
+      <dd><a href="mailto:you@blackswampanalytics.com">you@blackswampanalytics.com</a></dd>
+
+      <dt>Based in</dt>
+      <dd>Bowling Green, Ohio</dd>
+
+      <dt>Service area</dt>
+      <dd>Northwest Ohio counties, townships, and agencies. Remote work considered anywhere.</dd>
+
+      <dt>Hours</dt>
+      <dd>Monday–Friday, 8am–5pm. Call anytime; if I'm in the field I'll ring back the same day.</dd>
+    </dl>
+  </div>
+</section>
+
+</main>
+
+<div class="marsh-band">
+<svg class="marsh" viewBox="0 0 1200 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <g class="marsh-back"><path d="M-10 120 C-11 99 -16 81 -19 74" stroke-width="1.3"/><path d="M6 120 C7 96 10 75 12 68" stroke-width="1.6"/><path d="M18 120 C19 94 20 71 21 63" stroke-width="1.7"/><path d="M33 120 C32 93 31 68 31 59" stroke-width="1.3"/><path d="M43 120 C41 94 36 71 32 63" stroke-width="1.7"/><path d="M57 120 C58 104 63 89 66 84" stroke-width="1.2"/><path d="M73 120 C71 93 67 68 64 59" stroke-width="1.7"/><path d="M88 120 C88 103 91 88 93 82" stroke-width="1.3"/><path d="M104 120 C106 95 114 72 119 64" stroke-width="1.2"/><path d="M115 120 C116 96 118 74 119 66" stroke-width="1.3"/><path d="M132 120 C131 93 127 68 125 59" stroke-width="1.3"/><path d="M146 120 C147 99 149 80 151 73" stroke-width="1.5"/><path d="M158 120 C156 104 150 91 146 85" stroke-width="1.5"/><path d="M173 120 C174 99 178 80 181 72" stroke-width="1.6"/><path d="M189 120 C188 95 185 73 183 65" stroke-width="1.3"/><path d="M198 120 C200 104 206 90 210 85" stroke-width="1.8"/><path d="M213 120 C214 103 217 88 219 83" stroke-width="1.3"/><path d="M230 120 C231 95 235 73 238 65" stroke-width="1.6"/><path d="M242 120 C244 92 252 68 257 59" stroke-width="1.4"/><path d="M254 120 C255 94 258 71 260 63" stroke-width="1.5"/><path d="M267 120 C266 91 262 65 260 55" stroke-width="1.3"/><path d="M282 120 C283 101 290 84 294 77" stroke-width="1.4"/><path d="M298 120 C300 99 306 81 310 74" stroke-width="1.7"/><path d="M313 120 C311 102 306 85 302 79" stroke-width="1.2"/><path d="M323 120 C321 95 314 73 309 65" stroke-width="1.4"/><path d="M337 120 C336 102 333 87 331 81" stroke-width="1.4"/><path d="M351 120 C354 103 362 88 367 82" stroke-width="1.6"/><path d="M366 120 C366 97 366 76 366 68" stroke-width="1.9"/><path d="M382 120 C380 93 372 69 367 60" stroke-width="1.6"/><path d="M399 120 C399 96 399 74 399 66" stroke-width="1.7"/><path d="M409 120 C410 94 415 71 418 63" stroke-width="1.3"/><path d="M422 120 C421 96 419 75 417 67" stroke-width="1.7"/><path d="M438 120 C438 92 434 66 432 57" stroke-width="1.3"/><path d="M454 120 C456 96 461 74 465 66" stroke-width="1.8"/><path d="M466 120 C465 96 461 75 459 67" stroke-width="1.8"/><path d="M480 120 C480 101 480 85 480 78" stroke-width="1.6"/><path d="M491 120 C491 102 490 86 490 80" stroke-width="1.3"/><path d="M504 120 C505 91 511 66 514 56" stroke-width="1.2"/><path d="M519 120 C520 94 524 72 526 63" stroke-width="1.2"/><path d="M535 120 C536 102 541 86 544 80" stroke-width="1.4"/><path d="M546 120 C548 102 554 86 558 80" stroke-width="1.4"/><path d="M562 120 C561 97 555 77 551 70" stroke-width="1.7"/><path d="M576 120 C577 104 582 90 586 85" stroke-width="1.4"/><path d="M585 120 C586 94 590 70 592 61" stroke-width="1.5"/><path d="M595 120 C596 97 597 77 598 69" stroke-width="1.7"/><path d="M608 120 C609 97 613 76 615 68" stroke-width="1.3"/><path d="M619 120 C620 98 624 78 627 70" stroke-width="1.8"/><path d="M635 120 C636 98 639 79 641 72" stroke-width="1.3"/><path d="M647 120 C648 104 654 89 657 84" stroke-width="1.9"/><path d="M661 120 C660 94 658 71 657 62" stroke-width="1.8"/><path d="M671 120 C670 99 668 81 666 74" stroke-width="1.8"/><path d="M681 120 C679 102 673 87 668 81" stroke-width="1.8"/><path d="M693 120 C692 92 689 67 687 57" stroke-width="1.8"/><path d="M703 120 C705 92 713 67 718 57" stroke-width="1.8"/><path d="M718 120 C720 92 726 67 731 57" stroke-width="1.9"/><path d="M729 120 C730 92 735 68 738 59" stroke-width="1.4"/><path d="M739 120 C739 92 739 67 738 57" stroke-width="1.6"/><path d="M755 120 C754 98 750 78 747 71" stroke-width="1.7"/><path d="M769 120 C770 101 773 84 775 77" stroke-width="1.8"/><path d="M780 120 C781 93 785 69 788 60" stroke-width="1.6"/><path d="M790 120 C789 95 786 73 783 65" stroke-width="1.4"/><path d="M806 120 C804 101 797 84 793 77" stroke-width="1.8"/><path d="M823 120 C822 100 821 83 820 76" stroke-width="1.6"/><path d="M838 120 C839 105 841 91 843 86" stroke-width="1.4"/><path d="M854 120 C857 99 864 80 869 73" stroke-width="1.5"/><path d="M869 120 C867 104 862 90 859 85" stroke-width="1.4"/><path d="M881 120 C880 102 879 86 878 80" stroke-width="1.3"/><path d="M894 120 C896 91 902 65 906 55" stroke-width="1.6"/><path d="M911 120 C912 94 914 71 915 63" stroke-width="1.5"/><path d="M921 120 C923 92 929 67 933 57" stroke-width="1.8"/><path d="M935 120 C937 93 945 69 950 60" stroke-width="1.9"/><path d="M950 120 C952 104 960 91 965 85" stroke-width="1.6"/><path d="M963 120 C962 98 958 79 956 72" stroke-width="1.2"/><path d="M977 120 C975 96 968 74 964 66" stroke-width="1.8"/><path d="M993 120 C993 92 994 68 994 58" stroke-width="1.5"/><path d="M1006 120 C1008 99 1015 81 1020 74" stroke-width="1.8"/><path d="M1022 120 C1022 97 1022 77 1022 69" stroke-width="1.7"/><path d="M1033 120 C1036 102 1043 86 1049 80" stroke-width="1.4"/><path d="M1045 120 C1043 98 1036 78 1031 70" stroke-width="1.6"/><path d="M1055 120 C1053 93 1046 69 1041 59" stroke-width="1.8"/><path d="M1066 120 C1067 93 1072 70 1076 61" stroke-width="1.9"/><path d="M1076 120 C1075 91 1069 64 1065 54" stroke-width="1.4"/><path d="M1085 120 C1083 98 1077 78 1072 70" stroke-width="1.6"/><path d="M1102 120 C1103 93 1105 70 1107 61" stroke-width="1.3"/><path d="M1119 120 C1121 99 1128 81 1133 74" stroke-width="1.3"/><path d="M1130 120 C1131 91 1135 65 1138 56" stroke-width="1.3"/><path d="M1143 120 C1142 97 1138 76 1135 69" stroke-width="1.4"/><path d="M1152 120 C1152 97 1151 77 1150 70" stroke-width="1.4"/><path d="M1165 120 C1165 100 1163 82 1162 75" stroke-width="1.7"/><path d="M1175 120 C1175 103 1174 89 1174 83" stroke-width="1.4"/><path d="M1188 120 C1190 92 1198 68 1203 58" stroke-width="1.8"/><path d="M1205 120 C1204 101 1201 85 1200 79" stroke-width="1.3"/><path d="M1216 120 C1215 101 1211 84 1208 78" stroke-width="1.4"/></g>
+  <g class="marsh-front"><path d="M-10 120 C-7 86 1 57 8 45" stroke-width="2.0"/><path d="M17 120 C18 83 20 51 22 39" stroke-width="2.3"/><path d="M43 120 C41 87 35 57 31 46" stroke-width="1.7"/><path d="M66 120 C63 89 55 61 50 50" stroke-width="2.4"/><path d="M83 120 C81 88 76 59 72 49" stroke-width="1.9"/><path d="M112 120 C111 78 109 40 107 26" stroke-width="2.2"/><path d="M141 120 C141 91 138 65 137 55" stroke-width="1.9"/><path d="M170 120 C173 91 181 64 187 55" stroke-width="1.7"/><path d="M197 120 C193 84 183 52 176 40" stroke-width="1.9"/><path d="M225 120 C222 89 213 61 206 50" stroke-width="2.0"/><path d="M250 120 C249 87 248 58 246 47" stroke-width="2.4"/><path d="M276 120 C276 88 275 59 274 48" stroke-width="2.2"/><path d="M297 120 C298 87 304 58 308 47" stroke-width="1.7"/><path d="M316 120 C317 96 320 74 323 66" stroke-width="2.2"/><path d="M342 120 C339 84 328 53 321 41" stroke-width="1.9"/><path d="M365 120 C364 90 358 63 354 53" stroke-width="1.9"/><path d="M385 120 C386 95 388 73 389 65" stroke-width="1.6"/><path d="M409 120 C411 89 417 61 422 50" stroke-width="2.2"/><path d="M432 120 C433 96 438 76 441 68" stroke-width="2.2"/><path d="M458 120 C458 77 458 39 458 24" stroke-width="1.9"/><path d="M482 120 C483 95 486 72 488 63" stroke-width="1.7"/><path d="M509 120 C510 84 514 53 517 41" stroke-width="1.7"/><path d="M536 120 C539 78 550 41 557 27" stroke-width="2.2"/><path d="M555 120 C553 81 546 47 541 34" stroke-width="2.4"/><path d="M572 120 C572 96 570 75 568 67" stroke-width="1.7"/><path d="M603 120 C601 78 596 41 592 27" stroke-width="2.3"/><path d="M625 120 C622 80 614 45 608 32" stroke-width="2.4"/><path d="M648 120 C648 92 646 67 645 58" stroke-width="1.6"/><path d="M665 120 C666 87 668 58 670 47" stroke-width="2.4"/><path d="M690 120 C688 90 683 63 679 53" stroke-width="1.6"/><path d="M720 120 C718 83 713 50 709 37" stroke-width="2.2"/><path d="M746 120 C746 84 745 52 744 40" stroke-width="2.3"/><path d="M776 120 C774 82 767 47 762 35" stroke-width="2.0"/><path d="M802 120 C802 78 802 40 802 26" stroke-width="2.0"/><path d="M820 120 C819 95 813 73 810 65" stroke-width="2.1"/><path d="M840 120 C841 82 844 48 846 35" stroke-width="1.8"/><path d="M864 120 C861 80 851 45 844 31" stroke-width="2.1"/><path d="M892 120 C891 77 887 40 885 25" stroke-width="2.1"/><path d="M920 120 C922 91 928 64 932 55" stroke-width="2.2"/><path d="M951 120 C948 88 939 60 933 50" stroke-width="2.0"/><path d="M977 120 C979 79 984 42 988 28" stroke-width="2.0"/><path d="M1006 120 C1007 80 1009 44 1011 31" stroke-width="1.8"/><path d="M1023 120 C1020 85 1009 54 1002 42" stroke-width="1.9"/><path d="M1054 120 C1055 91 1059 66 1062 57" stroke-width="2.2"/><path d="M1076 120 C1078 85 1087 53 1093 42" stroke-width="2.2"/><path d="M1097 120 C1098 77 1102 39 1105 24" stroke-width="1.8"/><path d="M1126 120 C1128 81 1136 46 1142 34" stroke-width="2.3"/><path d="M1154 120 C1155 89 1161 61 1165 51" stroke-width="2.2"/><path d="M1182 120 C1185 92 1196 68 1204 59" stroke-width="2.1"/><path d="M1212 120 C1214 86 1220 56 1224 45" stroke-width="2.1"/></g>
+  <g class="marsh-cat"><path class="stem" d="M70 120 C69 66 67 34 66 13" stroke-width="2.2"/><rect class="head" x="62.2" y="13" width="7.0" height="23" rx="3.5"/><path class="stem" d="M66 13 l-2 -12" stroke-width="1.6"/><path class="stem" d="M212 120 C213 67 213 35 213 14" stroke-width="2.2"/><rect class="head" x="209.4" y="14" width="7.0" height="21" rx="3.5"/><path class="stem" d="M213 14 l0 -12" stroke-width="1.6"/><path class="stem" d="M342 120 C341 72 336 43 333 23" stroke-width="2.2"/><rect class="head" x="329.9" y="23" width="7.0" height="20" rx="3.5"/><path class="stem" d="M333 23 l-5 -12" stroke-width="1.6"/><path class="stem" d="M476 120 C476 70 475 40 474 20" stroke-width="2.2"/><rect class="head" x="470.8" y="20" width="7.0" height="20" rx="3.5"/><path class="stem" d="M474 20 l-1 -12" stroke-width="1.6"/><path class="stem" d="M599 120 C598 69 594 38 592 17" stroke-width="2.2"/><rect class="head" x="588.0" y="17" width="7.0" height="18" rx="3.5"/><path class="stem" d="M592 17 l-5 -12" stroke-width="1.6"/><path class="stem" d="M735 120 C736 65 740 31 742 9" stroke-width="2.2"/><rect class="head" x="738.4" y="9" width="7.0" height="21" rx="3.5"/><path class="stem" d="M742 9 l4 -12" stroke-width="1.6"/><path class="stem" d="M894 120 C895 74 896 47 897 29" stroke-width="2.2"/><rect class="head" x="893.4" y="29" width="7.0" height="20" rx="3.5"/><path class="stem" d="M897 29 l2 -12" stroke-width="1.6"/><path class="stem" d="M1002 120 C1001 69 998 39 995 19" stroke-width="2.2"/><rect class="head" x="991.9" y="19" width="7.0" height="19" rx="3.5"/><path class="stem" d="M995 19 l-4 -12" stroke-width="1.6"/><path class="stem" d="M1139 120 C1140 74 1144 46 1146 28" stroke-width="2.2"/><rect class="head" x="1142.2" y="28" width="7.0" height="20" rx="3.5"/><path class="stem" d="M1146 28 l4 -12" stroke-width="1.6"/></g>
+</svg>
+</div>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>© <span id="yr">2026</span> Black Swamp Analytics LLC · Bowling Green, Ohio</span>
+    <span class="coords">41.3748° N, 83.6513° W</span>
+    <!-- FIXME -->
+    <span><a href="tel:+14197793101">(419) 779-3101</a> · <a href="mailto:you@blackswampanalytics.com">Email</a></span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+</script>
+
+</body>
+</html>
