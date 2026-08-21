@@ -12,6 +12,7 @@
      1. Your email address (appears 3 times)
      2. hero.jpg and about.jpg — upload alongside this file
      3. Check the hours line at the bottom is right
+     4. Selected Work has one entry as a placeholder — add more
      ========================================================== -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -148,6 +149,23 @@ a{color:inherit}
 .aside-note h3{font-size:1.15rem;margin-bottom:.5rem}
 .aside-note p{margin:0;color:var(--ink-soft);font-size:.98rem;max-width:62ch}
 
+/* ---------- selected work ---------- */
+.projects{margin-top:3rem;border-top:1.5px solid var(--line)}
+.proj{display:grid;grid-template-columns:.34fr .66fr;gap:2.8rem;padding:2.6rem 0;border-bottom:1px solid var(--line);align-items:start}
+@media (max-width:820px){.proj{grid-template-columns:1fr;gap:1.1rem;padding:2rem 0}}
+.proj-n{font-family:var(--display);font-size:.82rem;font-weight:700;letter-spacing:.18em;color:var(--contour);display:block;margin-bottom:.7rem}
+.proj-meta dt{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-top:.9rem}
+.proj-meta dt:first-of-type{margin-top:0}
+.proj-meta dd{margin:.15rem 0 0;font-size:.94rem}
+.proj h3{font-size:1.42rem;margin-bottom:.8rem;max-width:24ch}
+.proj p{margin:0 0 .9rem;color:var(--ink-soft);font-size:.99rem;max-width:64ch}
+.proj p:last-of-type{margin-bottom:0}
+.figs{display:flex;flex-wrap:wrap;gap:1.1rem 2.2rem;margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+.fig b{display:block;font-family:var(--display);font-weight:700;font-size:1.55rem;color:var(--contour);line-height:1;margin-bottom:.25rem}
+.fig span{font-size:.7rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}
+.proj-also{margin-top:2.2rem;font-size:.97rem;color:var(--ink-soft);max-width:66ch}
+.proj-note{margin-top:2.6rem;padding:1.4rem 1.6rem;background:rgba(59,81,48,.09);border:1.5px solid var(--line);border-left:2.5px solid var(--veg);font-size:.92rem;color:var(--ink-soft)}
+.proj-note p{margin:0;max-width:70ch}
 
 /* ---------- about ---------- */
 .about-grid{display:grid;grid-template-columns:.75fr 1.25fr;gap:3.5rem;align-items:start}
@@ -235,13 +253,13 @@ a{color:inherit}
         <a class="btn btn-solid" href="tel:+14197793101">Call (419) 779-3101</a>
         <a class="btn btn-ghost" href="#projects">See recent work</a>
       </div>
-      <p class="trust"><strong>Nearly ten years in geospatial work</strong>, including graduate study · Based in Bowling Green, Ohio<br>Recent work in <strong>Defiance, Paulding, Williams, Wood, Sandusky, Miami</strong> and <strong>Richland</strong> counties</p>
+      <p class="trust"><strong>Nearly ten years in geospatial work</strong>, including graduate study · Based in Bowling Green, Ohio<br>Recent work in <strong>Defiance, Paulding, Williams, Sandusky, Miami</strong> and <strong>Richland</strong> counties</p>
     </div>
 
     <figure class="plate">
       <!-- FIXME: upload a photo named hero.jpg — a map you've produced, or you at work -->
       <img src="hero.jpg" alt="A land use map of a northwest Ohio township produced by Black Swamp Analytics">
-      <figcaption><span>Fig. 1</span><span>Wood County, OH</span></figcaption>
+      <figcaption><span>Fig. 1</span><span>Northwest Ohio</span></figcaption>
     </figure>
   </div>
 </header>
@@ -311,8 +329,8 @@ a{color:inherit}
 <!-- ================= SELECTED WORK ================= -->
 <section class="sec wrap reveal" id="projects">
   <p class="eyebrow">Selected work</p>
-  <h2>Projects, and the numbers that came out of them</h2>
-  <p class="lede">A sample of recent land use and zoning analysis across northwest and west-central Ohio, performed under contract to Reveille Planning Ltd. Client data stays with the client — what's described here is method and result.</p>
+  <h2>Projects, and the problem behind each one</h2>
+  <p class="lede">Independent work, built outside of any public employment, on my own equipment and my own time. More going up here shortly.</p>
 
   <div class="projects">
 
@@ -320,91 +338,25 @@ a{color:inherit}
       <div class="proj-meta">
         <span class="proj-n">01</span>
         <dl>
-          <dt>Where</dt><dd>Defiance, Paulding &amp; Williams Counties</dd>
-          <dt>What</dt><dd>Regional land use plan</dd>
-          <dt>Role</dt><dd>GIS lead, in partnership with the Maumee Valley Planning Organization</dd>
+          <dt>Where</dt><dd>Cleveland, Ohio</dd>
+          <dt>What</dt><dd>Conference wayfinding, web and print</dd>
+          <dt>Role</dt><dd>Design, data assembly, and build</dd>
           <dt>Year</dt><dd>2026</dd>
         </dl>
       </div>
       <div>
-        <h3>A three-county land use plan built from scratch</h3>
-        <p>There was no regional dataset to inherit. The base had to be assembled county by county — parcels and zoning from three separate county portals, road inventory from ODOT TIMS, demographics from Census TIGER/Line — and reconciled into layers that behaved consistently across county lines.</p>
-        <p>The cartography got the same treatment. Rather than three unrelated map series, I built one layout template that reskins per county: same grid, same typography, same legend and credit block, with only the header lockup, accent color, and county seal changing. The plan reads as a single document, and each board still sees a map that looks like theirs.</p>
-        <div class="figs">
-          <div class="fig"><b>3</b><span>Counties, one plan</span></div>
-          <div class="fig"><b>1</b><span>Shared map template</span></div>
-          <div class="fig"><b>0</b><span>Regional datasets that existed first</span></div>
-        </div>
-      </div>
-    </article>
-
-    <article class="proj">
-      <div class="proj-meta">
-        <span class="proj-n">02</span>
-        <dl>
-          <dt>Where</dt><dd>Perrysburg Township, Wood County</dd>
-          <dt>What</dt><dd>Land use inventory &amp; CAUV enrollment</dd>
-          <dt>Role</dt><dd>Analysis and deliverables</dd>
-          <dt>Year</dt><dd>2026</dd>
-        </dl>
-      </div>
-      <div>
-        <h3>Finding the farmland when the county doesn't flag it</h3>
-        <p>Wood County doesn't follow the standard Ohio DTE land use scheme — the 300-series is industrial rather than residential, and the 500-series functions as a tax exemption overlay rather than an institutional use. Every code had to be crosswalked to planning categories that a commission could actually read, with the ambiguous ones flagged rather than quietly assigned.</p>
-        <p>The CAUV question was harder. The parcel export carries no enrollment field, which the Auditor's office confirmed by phone; the only authoritative check is parcel-by-parcel on Beacon. So enrollment was derived from the reduced valuation, spot-checked against Beacon property reports, and the whole chain was written up on its own worksheet — because a number like 58.83% only survives a public meeting if you can show where it came from.</p>
-        <div class="figs">
-          <div class="fig"><b>5,655</b><span>Parcels classified</span></div>
-          <div class="fig"><b>12,699</b><span>Acres in CAUV</span></div>
-          <div class="fig"><b>58.8%</b><span>Of the township</span></div>
-        </div>
-      </div>
-    </article>
-
-    <article class="proj">
-      <div class="proj-meta">
-        <span class="proj-n">03</span>
-        <dl>
-          <dt>Where</dt><dd>Tipp City, Miami County</dd>
-          <dt>What</dt><dd>Existing land use &amp; zoning analysis</dd>
-          <dt>Role</dt><dd>Analysis and deliverables</dd>
-          <dt>Year</dt><dd>2026</dd>
-        </dl>
-      </div>
-      <div>
-        <h3>Reconciling 167 acres that didn't want to be reconciled</h3>
-        <p>Existing land use and zoning, summarized citywide and broken out across seven planning areas and eighteen zoning districts — including the unincorporated township land inside the planning boundary but outside city jurisdiction, which is exactly the row that gets argued about.</p>
-        <p>The planning area polygons totaled about 167 acres more than the classified land use table. That gap is roads, water, and geometry slivers carrying no land use assignment. I tracked it down, established the correct denominator, and put a methodology note on the face of the spreadsheet explaining why the totals don't tie and why that's right rather than wrong.</p>
-        <div class="figs">
-          <div class="fig"><b>7</b><span>Planning areas</span></div>
-          <div class="fig"><b>18</b><span>Zoning districts</span></div>
-          <div class="fig"><b>10,251</b><span>Acres classified</span></div>
-        </div>
-      </div>
-    </article>
-
-    <article class="proj">
-      <div class="proj-meta">
-        <span class="proj-n">04</span>
-        <dl>
-          <dt>Where</dt><dd>City of Ontario, Richland County</dd>
-          <dt>What</dt><dd>Zoning conformity review</dd>
-          <dt>Role</dt><dd>Parcel analysis</dd>
-          <dt>Year</dt><dd>2026</dd>
-        </dl>
-      </div>
-      <div>
-        <h3>Which parcels no longer fit the district they're in</h3>
-        <p>Parcel-level work to identify non-conforming residential lots by zoning district, and to flag residentially-used parcels sitting inside non-residential districts — concentrated in the Park East and Old Ontario areas, where the zoning map and the built reality drifted apart decades ago.</p>
-        <p>One honest limitation was worth naming up front: CAMA data gives acreage but not lot dimensions or frontage, so conformity tests that depend on lot width can't be answered from the parcel table alone. Better to scope that at the start than to deliver a number nobody can stand behind.</p>
+        <h3>Two products, one dataset, two very different readers</h3>
+        <p>Attendees at a national conference arrive knowing the venue and nothing else. The problem is not finding a restaurant, it is choosing among forty of them in a district you have never walked, on a phone, between sessions.</p>
+        <p>I built a curated attractions dataset for the venue and surrounding district, then published it twice from the same source. An interactive web map for someone standing on a corner with fifteen minutes, and a print flyer for the tote bag, laid out to be read once and folded into a pocket.</p>
+        <p>Keeping both products on one dataset is the part that matters. A wayfinding map that disagrees with the handout is worse than either one alone, and the only way to guarantee they agree is to stop maintaining them separately.</p>
+        <p>The print piece was submitted to the Ohio GIS Conference map gallery.</p>
       </div>
     </article>
 
   </div>
 
-  <p class="proj-also">Also: countywide land use classification for Sandusky County across 33,353 parcels, and CAUV enrollment analysis for Waterville Township — 175 parcels, roughly 5,907 acres.</p>
-
   <div class="proj-note">
-    <p>Most of this work arrives as a formatted Excel workbook with a summary tab, a breakdown by planning area or district, and a methodology note written in plain English — plus the geodatabase or shapefile behind it. The point is that six months from now, somebody else can pick it up and see how the number was made.</p>
+    <p>Work generally arrives as a formatted workbook with a summary tab, a breakdown by area or district, and a methodology note written in plain English, plus the geodatabase or shapefile behind it. The point is that six months from now, somebody else can pick it up and see how the number was made.</p>
   </div>
 </section>
 
