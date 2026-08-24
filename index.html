@@ -11,8 +11,9 @@
      STILL TO FILL IN — search the file for the word FIXME
      1. Your email address (appears 3 times)
      2. hero.jpg and about.jpg — upload alongside this file
-     3. Check the hours line at the bottom is right
-     4. Selected Work has one entry as a placeholder — add more
+     3. nace-map-poster.jpg — screenshot of the Cleveland map
+     4. Check the hours line at the bottom is right
+     5. Selected Work has one entry so far — add more
      ========================================================== -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -166,6 +167,24 @@ a{color:inherit}
 .proj-also{margin-top:2.2rem;font-size:.97rem;color:var(--ink-soft);max-width:66ch}
 .proj-note{margin-top:2.6rem;padding:1.4rem 1.6rem;background:rgba(59,81,48,.09);border:1.5px solid var(--line);border-left:2.5px solid var(--veg);font-size:.92rem;color:var(--ink-soft)}
 .proj-note p{margin:0;max-width:70ch}
+
+/* ---------- embedded map ---------- */
+.mapframe{position:relative;margin:1.8rem 0 0;padding:.7rem;background:var(--paper-2);border:1.5px solid var(--line);box-shadow:0 14px 34px -22px rgba(26,32,22,.55)}
+.mapframe::before,.mapframe::after{content:"";position:absolute;width:13px;height:13px;border:1.5px solid var(--contour)}
+.mapframe::before{top:-1.5px;left:-1.5px;border-right:0;border-bottom:0}
+.mapframe::after{bottom:-1.5px;right:-1.5px;border-left:0;border-top:0}
+.map-stage{position:relative;aspect-ratio:16/10;min-height:360px;background:#cdbf9e;overflow:hidden}
+@media (max-width:700px){.map-stage{aspect-ratio:3/4;min-height:420px}}
+.map-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.map-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.map-load{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.85rem;padding:1.5rem;cursor:pointer;border:0;text-align:center;font-family:var(--body);color:var(--paper);background:linear-gradient(rgba(38,51,31,.62),rgba(38,51,31,.62));transition:background .2s ease}
+.map-load:hover{background:linear-gradient(rgba(38,51,31,.48),rgba(38,51,31,.48))}
+.map-load b{font-family:var(--display);font-variation-settings:"SOFT" 40,"WONK" 1;font-weight:600;font-size:1.3rem;line-height:1.15}
+.map-load .sub{font-size:.88rem;max-width:36ch;color:rgba(233,224,200,.86);line-height:1.5}
+.map-load .pill{display:inline-block;margin-top:.3rem;background:var(--contour);color:#fff;font-weight:700;font-size:.92rem;padding:.62rem 1.3rem;box-shadow:3px 3px 0 rgba(233,224,200,.32)}
+@media (prefers-reduced-motion:reduce){.map-load{transition:none}}
+.mapframe figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:.7rem}
+.mapframe figcaption a{text-decoration:none;border-bottom:1px solid var(--contour)}
 
 /* ---------- about ---------- */
 .about-grid{display:grid;grid-template-columns:.75fr 1.25fr;gap:3.5rem;align-items:start}
@@ -350,6 +369,24 @@ a{color:inherit}
         <p>I built a curated attractions dataset for the venue and surrounding district, then published it twice from the same source. An interactive web map for someone standing on a corner with fifteen minutes, and a print flyer for the tote bag, laid out to be read once and folded into a pocket.</p>
         <p>Keeping both products on one dataset is the part that matters. A wayfinding map that disagrees with the handout is worse than either one alone, and the only way to guarantee they agree is to stop maintaining them separately.</p>
         <p>The print piece was submitted to the Ohio GIS Conference map gallery.</p>
+
+        <figure class="mapframe">
+          <div class="map-stage">
+            <!-- FIXME: upload nace-map-poster.jpg — a screenshot of the map, roughly 1600x1000 -->
+            <img class="map-poster" src="nace-map-poster.jpg" alt="Cleveland attractions and transit map: host hotel, GCRTA Rapid lines, and attraction points across downtown.">
+            <button class="map-load" type="button"
+                    data-map-src="https://fultoncounty-hub.github.io/NACE-Cleveland-Attraction-Map/"
+                    data-map-title="Cleveland Attractions and Transit, NACE 2027">
+              <b>Cleveland Attractions &amp; Transit</b>
+              <span class="sub">Attractions, GCRTA Rapid lines, and stations around the host hotel. Loads on tap.</span>
+              <span class="pill">Open the interactive map</span>
+            </button>
+          </div>
+          <figcaption>
+            <span>Fig. 2 — NACE 2027, Cleveland</span>
+            <span><a href="https://fultoncounty-hub.github.io/NACE-Cleveland-Attraction-Map/" target="_blank" rel="noopener">Open in a new tab ↗</a></span>
+          </figcaption>
+        </figure>
       </div>
     </article>
 
@@ -499,12 +536,28 @@ a{color:inherit}
 
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
+
 var io = new IntersectionObserver(function(entries){
   entries.forEach(function(e){
     if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
   });
 },{threshold:.12});
 document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+/* click-to-load map embeds */
+document.querySelectorAll('.map-load').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var stage = btn.closest('.map-stage');
+    var f = document.createElement('iframe');
+    f.src = btn.dataset.mapSrc;
+    f.title = btn.dataset.mapTitle;
+    f.setAttribute('loading','lazy');
+    f.setAttribute('allow','geolocation; fullscreen');
+    f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+    stage.textContent = '';
+    stage.appendChild(f);
+  });
+});
 </script>
 
 </body>
