@@ -11,7 +11,7 @@
      STILL TO FILL IN — search the file for the word FIXME
      1. Your email address (appears 3 times)
      2. hero.jpg and about.jpg — upload alongside this file
-     3. nace-map-poster.jpg — screenshot of the Cleveland map
+     3. taoteaware-map-poster.jpg — screenshot of the Tao Teaware map
      4. Check the hours line at the bottom is right
      5. Selected Work has one entry so far — add more
      ========================================================== -->
@@ -357,34 +357,33 @@ a{color:inherit}
       <div class="proj-meta">
         <span class="proj-n">01</span>
         <dl>
-          <dt>Where</dt><dd>Cleveland, Ohio</dd>
-          <dt>What</dt><dd>Conference wayfinding, web and print</dd>
-          <dt>Role</dt><dd>Design, data assembly, and build</dd>
-          <dt>Year</dt><dd>2026</dd>
+          <dt>Client</dt><dd>Tao Teaware</dd>
+          <dt>What</dt><dd>Interactive origin map for a product catalog</dd>
+          <dt>Role</dt><dd>Data assembly, design, and build</dd>
+          <dt>Year</dt><dd>2024–25</dd>
         </dl>
       </div>
       <div>
-        <h3>Two products, one dataset, two very different readers</h3>
-        <p>Attendees at a national conference arrive knowing the venue and nothing else. The problem is not finding a restaurant, it is choosing among forty of them in a district you have never walked, on a phone, between sessions.</p>
-        <p>I built a curated attractions dataset for the venue and surrounding district, then published it twice from the same source. An interactive web map for someone standing on a corner with fifteen minutes, and a print flyer for the tote bag, laid out to be read once and folded into a pocket.</p>
-        <p>Keeping both products on one dataset is the part that matters. A wayfinding map that disagrees with the handout is worse than either one alone, and the only way to guarantee they agree is to stop maintaining them separately.</p>
-        <p>The print piece was submitted to the Ohio GIS Conference map gallery.</p>
+        <h3>A catalog is not a spatial dataset until somebody makes it one</h3>
+        <p>Tao Teaware sells single-origin tea and studio pottery. Every product listing named a place — Bangdong, Panxi, Jianshui, Jingdezhen — and to a customer who had never been to any of them, those names were doing no work at all. Origin was the whole pitch, and it was sitting in a text field.</p>
+        <p>I built an interactive map of the catalog. Pick an item from the sidebar and the map moves to where it came from, with the harvest season, the material, and a link back to the product. Tea and teaware toggle separately, because they come from genuinely different geographies: the tea from mountain villages in Yunnan and Fujian, the pottery from the kiln towns of Jingdezhen, Jianshui, and Chaozhou.</p>
+        <p>The mapping was the easy half. The real work was turning a seasonal product spreadsheet into coordinates somebody could stand behind — deciding what "from Jianshui" means precisely enough to place a point, and building it so the next season's catalog drops in rather than starting over.</p>
 
         <figure class="mapframe">
           <div class="map-stage">
-            <!-- FIXME: upload nace-map-poster.jpg — a screenshot of the map, roughly 1600x1000 -->
-            <img class="map-poster" src="nace-map-poster.jpg" alt="Cleveland attractions and transit map: host hotel, GCRTA Rapid lines, and attraction points across downtown.">
+            <!-- FIXME: upload taoteaware-map-poster.jpg — a screenshot of the map, roughly 1600x1000 -->
+            <img class="map-poster" src="taoteaware-map-poster.jpg" alt="Interactive map of tea and pottery origins across Yunnan, Fujian, Jiangxi, and Guangdong, with a product sidebar.">
             <button class="map-load" type="button"
-                    data-map-src="https://fultoncounty-hub.github.io/NACE-Cleveland-Attraction-Map/"
-                    data-map-title="Cleveland Attractions and Transit, NACE 2027">
-              <b>Cleveland Attractions &amp; Transit</b>
-              <span class="sub">Attractions, GCRTA Rapid lines, and stations around the host hotel. Loads on tap.</span>
+                    data-map-src="https://codepen.io/cncmqqnr-the-decoder/embed/LYwaYBa?default-tab=result"
+                    data-map-title="Tao Teaware tea and pottery origin map">
+              <b>Tea &amp; Teaware Origins</b>
+              <span class="sub">Every item in the catalog, placed where it was grown or fired. Loads on tap.</span>
               <span class="pill">Open the interactive map</span>
             </button>
           </div>
           <figcaption>
-            <span>Fig. 2 — NACE 2027, Cleveland</span>
-            <span><a href="https://fultoncounty-hub.github.io/NACE-Cleveland-Attraction-Map/" target="_blank" rel="noopener">Open in a new tab ↗</a></span>
+            <span>Fig. 2 — Tea and kiln regions, China</span>
+            <span><a href="https://codepen.io/cncmqqnr-the-decoder/pen/LYwaYBa" target="_blank" rel="noopener">Open in a new tab ↗</a></span>
           </figcaption>
         </figure>
       </div>
